@@ -40,9 +40,10 @@ import { motion, AnimatePresence } from 'motion/react';
 // --- Mock Data from Images ---
 
 const INITIAL_DAILY_SUMMARY = [
+  { label: 'Pendente', value: 0, percentage: '0,0%', meta: '-', color: 'bg-slate-100 text-slate-700' },
   { label: 'Encaminhados', value: 2187, percentage: '0,8%', meta: '<0,4%', color: 'bg-blue-100 text-blue-700' },
   { label: 'Em Atendimento', value: 18566, percentage: '6,65%', meta: '<2,5%', color: 'bg-indigo-100 text-indigo-700' },
-  { label: 'Atendidas', value: 83, percentage: '0,0%', meta: '<0,1%', color: 'bg-purple-100 text-purple-700' },
+  { label: 'Atendido', value: 83, percentage: '0,0%', meta: '<0,1%', color: 'bg-purple-100 text-purple-700' },
   { label: 'Resolvidas', value: 260548, percentage: '93,3%', meta: '>97%', color: 'bg-green-100 text-green-700' },
   { label: 'Recusadas', value: 10715, percentage: '3,8%', meta: '-', color: 'bg-red-100 text-red-700' },
   { label: 'Indeferidas', value: 2014, percentage: '0,72%', meta: '-', color: 'bg-orange-100 text-orange-700' },
@@ -68,15 +69,17 @@ const pieData = [
 
 // --- Components ---
 
-const StatCard = ({ title, value, subValue, icon: Icon, colorClass }: any) => (
+const StatCard = ({ title, value, subValue, icon: Icon, colorClass, valueContainerClass = "" }: any) => (
   <motion.div 
     whileHover={{ y: -4 }}
-    className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-start justify-between"
+    className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-start justify-between h-36"
   >
-    <div>
+    <div className="flex flex-col h-full justify-between">
       <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
-      <h3 className="text-2xl font-bold text-slate-900">{value}</h3>
-      {subValue && <p className="text-xs text-slate-400 mt-1">{subValue}</p>}
+      <div className={`mt-auto ${valueContainerClass}`}>
+        <h3 className="text-2xl font-bold text-slate-900">{value}</h3>
+        {subValue && <p className="text-xs text-slate-400 mt-1">{subValue}</p>}
+      </div>
     </div>
     <div className={`p-3 rounded-xl ${colorClass}`}>
       <Icon size={20} />
@@ -240,11 +243,12 @@ export default function App() {
                     subValue={`${summaryData.find(i => i.label === 'Resolvidas')?.percentage} do total`}
                     icon={CheckCircle2} 
                     colorClass="bg-green-100 text-green-600"
+                    valueContainerClass="pt-2"
                   />
                   <StatCard 
                     title="Em Atendimento" 
                     value={(totalDemands - (summaryData.find(i => i.label === 'Resolvidas')?.value || 0)).toLocaleString('pt-BR')} 
-                    subValue="+2,4% em relação a ontem"
+                    subValue="+ 2,4%"
                     icon={Clock} 
                     colorClass="bg-blue-100 text-blue-600"
                   />
@@ -253,12 +257,6 @@ export default function App() {
                 <div className="grid grid-cols-1 gap-4">
                   {/* Table Section */}
                   <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                      <h3 className="font-bold text-slate-900">Detalhamento de Status</h3>
-                      <button className="text-purple-600 text-sm font-medium flex items-center gap-1 hover:underline">
-                        Ver tudo <ChevronRight size={14} />
-                      </button>
-                    </div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-left">
                         <thead>
@@ -276,24 +274,24 @@ export default function App() {
                             
                             return (
                               <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                                <td className="px-6 py-2">
+                                <td className="px-6 py-3">
                                   <span className={`px-2 py-0.5 rounded-md text-[10px] font-medium ${item.color}`}>
                                     {item.label}
                                   </span>
                                 </td>
-                                <td className="px-6 py-2 font-mono text-sm">{item.value.toLocaleString('pt-BR')}</td>
-                                <td className="px-6 py-2 text-sm font-medium">{item.percentage}</td>
+                                <td className="px-6 py-3 font-mono text-sm">{item.value.toLocaleString('pt-BR')}</td>
+                                <td className="px-6 py-3 text-sm font-medium">{item.percentage}</td>
                                 {isGrouped ? (
                                   isFirstInGroup ? (
-                                    <td rowSpan={3} className="px-6 py-2 text-sm font-bold text-slate-900 bg-slate-50/50 border-l border-slate-100 text-center align-middle">
-                                      <div className="flex flex-col items-center justify-center gap-1">
+                                    <td rowSpan={3} className="px-6 py-3 text-sm font-bold text-slate-900 bg-slate-50/50 border-l border-slate-100 text-center align-middle">
+                                      <div className="flex items-center justify-center gap-2">
                                         <CheckCircle2 size={16} className="text-green-600" />
                                         <span>{'>'}97%</span>
                                       </div>
                                     </td>
                                   ) : null
                                 ) : (
-                                  <td className="px-6 py-2 text-sm text-slate-400">
+                                  <td className="px-6 py-3 text-sm text-slate-400 text-center">
                                     {item.meta}
                                   </td>
                                 )}
