@@ -1,0 +1,5 @@
+{
+  "name": "Colab Dashboard",
+  "description": "Painel de controle para monitoramento de demandas e atendimentos por bairro.",
+  "requestFramePermissions": []
+}
