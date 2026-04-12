@@ -444,22 +444,22 @@ export default function App() {
                             <td className="px-2 py-3 text-center">
                               {(() => {
                                 const diff = item.previous - item.current;
-                                if (diff === 0) {
-                                  return (
-                                    <span className="inline-flex items-center justify-center w-6 h-6 bg-yellow-100 text-yellow-600 rounded-full">
-                                      <Clock size={12} />
-                                    </span>
-                                  );
-                                } else if (diff > 0) {
+                                if (diff <= -1) {
                                   return (
                                     <span className="inline-flex items-center justify-center w-6 h-6 bg-green-100 text-green-600 rounded-full">
                                       <TrendingUp size={12} />
                                     </span>
                                   );
-                                } else {
+                                } else if (diff >= 1) {
                                   return (
                                     <span className="inline-flex items-center justify-center w-6 h-6 bg-red-100 text-red-600 rounded-full">
                                       <TrendingDown size={12} />
+                                    </span>
+                                  );
+                                } else {
+                                  return (
+                                    <span className="inline-flex items-center justify-center w-6 h-6 bg-yellow-100 text-yellow-600 rounded-full">
+                                      <Clock size={12} />
                                     </span>
                                   );
                                 }
