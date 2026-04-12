@@ -21,7 +21,9 @@ import {
   X,
   PlusCircle,
   Save,
-  Inbox
+  Inbox,
+  Lock,
+  LogOut
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -98,6 +100,9 @@ const StatCard = ({ title, value, subValue, icon: Icon, colorClass, valueContain
 export default function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('daily');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [summaryData, setSummaryData] = useState(INITIAL_DAILY_SUMMARY);
   const [receivedToday, setReceivedToday] = useState(1245);
   const [totalDemands, setTotalDemands] = useState(279114);
@@ -120,6 +125,16 @@ export default function App() {
     { name: 'Vila Emil', total: 30231, resolved: 29770, current: 98, previous: 99, signal: -1, open: 461 },
     { name: 'Vila Norma', total: 5000, resolved: 4900, current: 98, previous: 98, signal: 0, open: 100 },
   ]);
+
+  const handleLogin = (e: FormEvent) => {
+    e.preventDefault();
+    // Simple mock login
+    if (email === 'admin@colab.com' && password === 'admin') {
+      setIsLoggedIn(true);
+    } else {
+      alert('Credenciais inválidas');
+    }
+  };
 
   const handleUpdateData = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -152,7 +167,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 flex font-sans text-slate-900">
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:translate-x-0`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:translate-x-0 flex flex-col`}>
         <div className="p-6 flex items-center gap-3 border-bottom border-slate-100">
           <div className="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center text-white">
             <LayoutDashboard size={24} />
@@ -160,7 +175,7 @@ export default function App() {
           <h1 className="text-xl font-bold tracking-tight text-purple-900">COLAB</h1>
         </div>
 
-        <nav className="mt-6 px-4 space-y-2">
+        <nav className="mt-6 px-4 space-y-2 flex-1">
           <button 
             onClick={() => setActiveTab('daily')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${activeTab === 'daily' ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50'}`}
@@ -169,38 +184,66 @@ export default function App() {
             Dados Diários
           </button>
           <button 
-            onClick={() => setActiveTab('input')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${activeTab === 'input' ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50'}`}
-          >
-            <PlusCircle size={18} />
-            Inserir dados Diários
-          </button>
-          <button 
             onClick={() => setActiveTab('weekly')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${activeTab === 'weekly' ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50'}`}
           >
             <TrendingUp size={18} />
             Planilha dos Bairros
           </button>
-          <button 
-            onClick={() => setActiveTab('input-neighborhood')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${activeTab === 'input-neighborhood' ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50'}`}
-          >
-            <PlusCircle size={18} />
-            Inserir Dados Bairros
-          </button>
+          {isLoggedIn && (
+            <>
+              <button 
+                onClick={() => setActiveTab('input')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${activeTab === 'input' ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50'}`}
+              >
+                <PlusCircle size={18} />
+                Inserir dados Diários
+              </button>
+              <button 
+                onClick={() => setActiveTab('input-neighborhood')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${activeTab === 'input-neighborhood' ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50'}`}
+              >
+                <PlusCircle size={18} />
+                Inserir Dados Bairros
+              </button>
+            </>
+          )}
         </nav>
 
-        <div className="absolute bottom-0 w-full p-6 border-t border-slate-100">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-slate-200 rounded-full overflow-hidden">
-              <img src="https://picsum.photos/seed/user/32/32" alt="User" referrerPolicy="no-referrer" />
+        <div className="p-6 border-t border-slate-100">
+          {!isLoggedIn ? (
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 text-slate-700 font-semibold">
+                <Lock size={16} />
+                <span className="text-sm">Acesso Restrito</span>
+              </div>
+              <form onSubmit={handleLogin} className="space-y-3">
+                <input 
+                  type="email" 
+                  placeholder="Email" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                />
+                <input 
+                  type="password" 
+                  placeholder="Senha" 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                />
+                <button type="submit" className="w-full bg-purple-600 text-white py-2 rounded-lg text-sm font-bold hover:bg-purple-700 transition-colors">Entrar</button>
+              </form>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">Ramon Lameira</p>
-              <p className="text-xs text-slate-500 truncate">Admin</p>
-            </div>
-          </div>
+          ) : (
+            <button 
+              onClick={() => setIsLoggedIn(false)} 
+              className="w-full flex items-center justify-center gap-2 text-sm text-red-600 font-medium bg-red-50 py-2 rounded-lg hover:bg-red-100 transition-colors"
+            >
+              <LogOut size={16} />
+              Sair
+            </button>
+          )}
         </div>
       </aside>
 
