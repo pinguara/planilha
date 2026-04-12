@@ -24,7 +24,8 @@ import {
   Save,
   Inbox,
   Lock,
-  LogOut
+  LogOut,
+  Building
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -128,8 +129,14 @@ export default function App() {
   ]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsLoggedIn(!!session);
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error('Error getting session:', error);
+        supabase.auth.signOut();
+        setIsLoggedIn(false);
+      } else {
+        setIsLoggedIn(!!session);
+      }
     });
 
     const {
@@ -210,6 +217,13 @@ export default function App() {
           >
             <TrendingUp size={18} />
             Planilha dos Bairros
+          </button>
+          <button 
+            onClick={() => window.location.href = 'https://meusetor.vercel.app/'}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+          >
+            <Building size={18} />
+            Setor
           </button>
           {isLoggedIn && (
             <>
