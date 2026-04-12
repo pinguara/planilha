@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, FormEvent } from 'react';
+import { supabase } from './lib/supabase';
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -126,14 +127,34 @@ export default function App() {
     { name: 'Vila Norma', total: 5000, resolved: 4900, current: 98, previous: 98, signal: 0, open: 100 },
   ]);
 
-  const handleLogin = (e: FormEvent) => {
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
-    // Simple mock login
-    if (email === 'admin@colab.com' && password === 'admin') {
-      setIsLoggedIn(true);
-    } else {
-      alert('Credenciais inválidas');
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      alert(error.message);
     }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
   };
 
   const handleUpdateData = (e: FormEvent<HTMLFormElement>) => {
@@ -237,7 +258,7 @@ export default function App() {
             </div>
           ) : (
             <button 
-              onClick={() => setIsLoggedIn(false)} 
+              onClick={handleLogout} 
               className="w-full flex items-center justify-center gap-2 text-sm text-red-600 font-medium bg-red-50 py-2 rounded-lg hover:bg-red-100 transition-colors"
             >
               <LogOut size={16} />
