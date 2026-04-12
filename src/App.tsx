@@ -50,16 +50,22 @@ const INITIAL_DAILY_SUMMARY = [
 ];
 
 const neighborhoodData = [
-  { name: 'BNH', total: 12622, resolved: 12433, current: 99, previous: 99, signal: 0, open: 189 },
-  { name: 'Vila Emil', total: 30231, resolved: 29770, current: 98, previous: 99, signal: -1, open: 461 },
-  { name: 'Cruzeiro do Sul', total: 8654, resolved: 8509, current: 98, previous: 98, signal: 0, open: 145 },
-  { name: 'Santo Elias', total: 20261, resolved: 19924, current: 98, previous: 98, signal: 0, open: 337 },
-  { name: 'Edson Passos', total: 26985, resolved: 26560, current: 98, previous: 99, signal: -1, open: 425 },
+  { name: 'Alto Uruguai', total: 5000, resolved: 4900, current: 98, previous: 98, signal: 0, open: 100 },
   { name: 'Banco de Areia', total: 22072, resolved: 21684, current: 98, previous: 98, signal: 0, open: 388 },
-  { name: 'Jacutinga', total: 13063, resolved: 12827, current: 98, previous: 98, signal: 0, open: 236 },
-  { name: 'Chatuba', total: 35904, resolved: 35232, current: 98, previous: 98, signal: 0, open: 672 },
-  { name: 'Rocha Sobrinho', total: 7183, resolved: 6993, current: 98, previous: 98, signal: 0, open: 190 },
+  { name: 'BNH', total: 12622, resolved: 12433, current: 99, previous: 99, signal: 0, open: 189 },
   { name: 'Centro', total: 37170, resolved: 36389, current: 98, previous: 98, signal: 0, open: 781 },
+  { name: 'Chatuba', total: 35904, resolved: 35232, current: 98, previous: 98, signal: 0, open: 672 },
+  { name: 'Coreia', total: 5000, resolved: 4900, current: 98, previous: 98, signal: 0, open: 100 },
+  { name: 'Cosmorama', total: 5000, resolved: 4900, current: 98, previous: 98, signal: 0, open: 100 },
+  { name: 'Cruzeiro do Sul', total: 8654, resolved: 8509, current: 98, previous: 98, signal: 0, open: 145 },
+  { name: 'Edson Passos', total: 26985, resolved: 26560, current: 98, previous: 99, signal: -1, open: 425 },
+  { name: 'Jacutinga', total: 13063, resolved: 12827, current: 98, previous: 98, signal: 0, open: 236 },
+  { name: 'Juscelino', total: 5000, resolved: 4900, current: 98, previous: 98, signal: 0, open: 100 },
+  { name: 'Rocha Sobrinho', total: 7183, resolved: 6993, current: 98, previous: 98, signal: 0, open: 190 },
+  { name: 'Santa Terezinha', total: 5000, resolved: 4900, current: 98, previous: 98, signal: 0, open: 100 },
+  { name: 'Santo Elias', total: 20261, resolved: 19924, current: 98, previous: 98, signal: 0, open: 337 },
+  { name: 'Vila Emil', total: 30231, resolved: 29770, current: 98, previous: 99, signal: -1, open: 461 },
+  { name: 'Vila Norma', total: 5000, resolved: 4900, current: 98, previous: 98, signal: 0, open: 100 },
 ];
 
 const pieData = [
@@ -72,13 +78,15 @@ const pieData = [
 const StatCard = ({ title, value, subValue, icon: Icon, colorClass, valueContainerClass = "" }: any) => (
   <motion.div 
     whileHover={{ y: -4 }}
-    className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-start justify-between h-36"
+    className="bg-white p-4 pb-2 rounded-2xl shadow-sm border border-slate-100 flex items-start justify-between h-36"
   >
     <div className="flex flex-col h-full justify-between">
       <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
       <div className={`mt-auto ${valueContainerClass}`}>
         <h3 className="text-2xl font-bold text-slate-900">{value}</h3>
-        {subValue && <p className="text-xs text-slate-400 mt-1">{subValue}</p>}
+        <p className={`text-xs text-slate-400 mt-1 ${subValue ? '' : 'invisible'}`}>
+          {subValue || 'Placeholder'}
+        </p>
       </div>
     </div>
     <div className={`p-3 rounded-xl ${colorClass}`}>
@@ -94,6 +102,24 @@ export default function App() {
   const [receivedToday, setReceivedToday] = useState(1245);
   const [totalDemands, setTotalDemands] = useState(279114);
   const [referenceDate, setReferenceDate] = useState('2026-04-10');
+  const [neighborhoodData, setNeighborhoodData] = useState([
+    { name: 'Alto Uruguai', total: 5000, resolved: 4900, current: 98, previous: 98, signal: 0, open: 100 },
+    { name: 'Banco de Areia', total: 22072, resolved: 21684, current: 98, previous: 98, signal: 0, open: 388 },
+    { name: 'BNH', total: 12622, resolved: 12433, current: 99, previous: 99, signal: 0, open: 189 },
+    { name: 'Centro', total: 37170, resolved: 36389, current: 98, previous: 98, signal: 0, open: 781 },
+    { name: 'Chatuba', total: 35904, resolved: 35232, current: 98, previous: 98, signal: 0, open: 672 },
+    { name: 'Coreia', total: 5000, resolved: 4900, current: 98, previous: 98, signal: 0, open: 100 },
+    { name: 'Cosmorama', total: 5000, resolved: 4900, current: 98, previous: 98, signal: 0, open: 100 },
+    { name: 'Cruzeiro do Sul', total: 8654, resolved: 8509, current: 98, previous: 98, signal: 0, open: 145 },
+    { name: 'Edson Passos', total: 26985, resolved: 26560, current: 98, previous: 99, signal: -1, open: 425 },
+    { name: 'Jacutinga', total: 13063, resolved: 12827, current: 98, previous: 98, signal: 0, open: 236 },
+    { name: 'Juscelino', total: 5000, resolved: 4900, current: 98, previous: 98, signal: 0, open: 100 },
+    { name: 'Rocha Sobrinho', total: 7183, resolved: 6993, current: 98, previous: 98, signal: 0, open: 190 },
+    { name: 'Santa Terezinha', total: 5000, resolved: 4900, current: 98, previous: 98, signal: 0, open: 100 },
+    { name: 'Santo Elias', total: 20261, resolved: 19924, current: 98, previous: 98, signal: 0, open: 337 },
+    { name: 'Vila Emil', total: 30231, resolved: 29770, current: 98, previous: 99, signal: -1, open: 461 },
+    { name: 'Vila Norma', total: 5000, resolved: 4900, current: 98, previous: 98, signal: 0, open: 100 },
+  ]);
 
   const handleUpdateData = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -143,22 +169,25 @@ export default function App() {
             Dados Diários
           </button>
           <button 
-            onClick={() => setActiveTab('weekly')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${activeTab === 'weekly' ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50'}`}
-          >
-            <TrendingUp size={18} />
-            Dados Semanais
-          </button>
-          <button 
             onClick={() => setActiveTab('input')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${activeTab === 'input' ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50'}`}
           >
             <PlusCircle size={18} />
-            Inserir Dados
+            Inserir dados Diários
           </button>
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50">
-            <MapPin size={18} />
-            Bairros
+          <button 
+            onClick={() => setActiveTab('weekly')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${activeTab === 'weekly' ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50'}`}
+          >
+            <TrendingUp size={18} />
+            Planilha dos Bairros
+          </button>
+          <button 
+            onClick={() => setActiveTab('input-neighborhood')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${activeTab === 'input-neighborhood' ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50'}`}
+          >
+            <PlusCircle size={18} />
+            Inserir Dados Bairros
           </button>
         </nav>
 
@@ -188,10 +217,10 @@ export default function App() {
             </button>
             <div className="hidden md:block">
               <h2 className="text-xl font-bold text-slate-800 leading-tight">
-                {activeTab === 'daily' ? 'Resumo diário' : activeTab === 'weekly' ? 'Dados Semanais' : 'Inserir Dados'}
+                {activeTab === 'daily' ? 'Planilha Diária' : activeTab === 'weekly' ? 'Planilha dos Bairros' : activeTab === 'input-neighborhood' ? 'Inserir Dados Bairros' : 'Inserir dados Diários'}
               </h2>
               <p className="text-xs text-slate-500">
-                {activeTab === 'daily' ? 'Visão geral das demandas recebidas hoje.' : activeTab === 'weekly' ? 'Desempenho por localidade.' : 'Atualize os números do sistema.'}
+                {activeTab === 'daily' ? 'Visão geral das demandas recebidas hoje.' : activeTab === 'weekly' ? 'Desempenho por localidade.' : activeTab === 'input-neighborhood' ? 'Preencha os dados da planilha dos bairros.' : 'Atualize os números do sistema.'}
               </p>
             </div>
           </div>
@@ -224,23 +253,23 @@ export default function App() {
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <StatCard 
-                    title="Demandas Recebidas" 
+                    title="Novas Demandas" 
                     value={receivedToday.toLocaleString('pt-BR')} 
-                    subValue="Novas"
+                    subValue={undefined}
                     icon={Inbox} 
                     colorClass="bg-orange-100 text-orange-600"
                   />
                   <StatCard 
                     title="Total de Demandas" 
                     value={totalDemands.toLocaleString('pt-BR')} 
-                    subValue="Acumulado total"
+                    subValue={undefined}
                     icon={LayoutDashboard} 
                     colorClass="bg-purple-100 text-purple-600"
                   />
                   <StatCard 
                     title="Resolvidas" 
                     value={summaryData.find(i => i.label === 'Resolvidas')?.value.toLocaleString('pt-BR')} 
-                    subValue={`${summaryData.find(i => i.label === 'Resolvidas')?.percentage} do total`}
+                    subValue={undefined}
                     icon={CheckCircle2} 
                     colorClass="bg-green-100 text-green-600"
                     valueContainerClass="pt-2"
@@ -248,7 +277,7 @@ export default function App() {
                   <StatCard 
                     title="Em Atendimento" 
                     value={(totalDemands - (summaryData.find(i => i.label === 'Resolvidas')?.value || 0)).toLocaleString('pt-BR')} 
-                    subValue="+ 2,4%"
+                    subValue={undefined}
                     icon={Clock} 
                     colorClass="bg-blue-100 text-blue-600"
                   />
@@ -315,89 +344,62 @@ export default function App() {
                 <div className="flex items-center justify-between">
                   {/* Title moved to header */}
                   <div className="flex gap-2">
-                    <button className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium hover:bg-slate-50 transition-colors">
-                      Exportar PDF
-                    </button>
-                  </div>
-                </div>
-
-                {/* Bar Chart */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                  <h3 className="font-bold text-slate-900 mb-6">Volume de Demandas por Bairro</h3>
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={neighborhoodData}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                        <XAxis 
-                          dataKey="name" 
-                          axisLine={false} 
-                          tickLine={false} 
-                          tick={{ fontSize: 10, fill: '#64748b' }}
-                          interval={0}
-                        />
-                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
-                        <Tooltip 
-                          cursor={{ fill: '#f8fafc' }}
-                          contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                        />
-                        <Bar dataKey="total" fill="#9333ea" radius={[4, 4, 0, 0]} barSize={30} />
-                      </BarChart>
-                    </ResponsiveContainer>
                   </div>
                 </div>
 
                 {/* Neighborhood Table */}
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                  <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                    <h3 className="font-bold text-slate-900">Ranking de Atendimento</h3>
-                    <div className="flex gap-4">
-                      <div className="flex items-center gap-2 text-xs text-slate-500">
-                        <div className="w-2 h-2 bg-red-500 rounded-full"></div> Queda
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-slate-500">
-                        <div className="w-2 h-2 bg-yellow-400 rounded-full"></div> Estável
-                      </div>
-                    </div>
-                  </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left">
                       <thead>
                         <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
-                          <th className="px-6 py-4 font-semibold">Bairro</th>
-                          <th className="px-6 py-4 font-semibold text-right">Qtd Total</th>
-                          <th className="px-6 py-4 font-semibold text-right">Resolvidas</th>
-                          <th className="px-6 py-4 font-semibold text-center">% Atual</th>
-                          <th className="px-6 py-4 font-semibold text-center">Sinal</th>
-                          <th className="px-6 py-4 font-semibold text-right">Em Aberto</th>
+                          <th className="px-2 py-3 font-semibold whitespace-nowrap">Bairro</th>
+                          <th className="px-2 py-3 font-semibold text-right">Total de Demandas</th>
+                          <th className="px-2 py-3 font-semibold text-right">Demandas Resolvidas</th>
+                          <th className="px-2 py-3 font-semibold text-right">Demandas em Atendimento</th>
+                          <th className="px-2 py-3 font-semibold text-center">% Semana Atual</th>
+                          <th className="px-2 py-3 font-semibold text-center">% Semana Anterior</th>
+                          <th className="px-2 py-3 font-semibold text-center">Indicador</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
                         {neighborhoodData.map((item, idx) => (
                           <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                            <td className="px-6 py-4 font-medium text-slate-900">{item.name}</td>
-                            <td className="px-6 py-4 text-right font-mono text-sm">{item.total.toLocaleString('pt-BR')}</td>
-                            <td className="px-6 py-4 text-right font-mono text-sm text-green-600">{item.resolved.toLocaleString('pt-BR')}</td>
-                            <td className="px-6 py-4 text-center">
-                              <div className="flex items-center justify-center gap-2">
-                                <div className="w-16 bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                                  <div className="bg-purple-500 h-full" style={{ width: `${item.current}%` }}></div>
-                                </div>
-                                <span className="text-sm font-bold">{item.current}%</span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-center">
-                              {item.signal === 0 ? (
-                                <span className="inline-flex items-center justify-center w-6 h-6 bg-yellow-100 text-yellow-600 rounded-full">
-                                  <Clock size={12} />
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center justify-center w-6 h-6 bg-red-100 text-red-600 rounded-full">
-                                  <TrendingDown size={12} />
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-6 py-4 text-right">
+                            <td className="px-2 py-3 font-medium text-slate-900 whitespace-nowrap">{item.name}</td>
+                            <td className="px-2 py-3 text-right font-mono text-sm">{item.total.toLocaleString('pt-BR')}</td>
+                            <td className="px-2 py-3 text-right font-mono text-sm text-green-600">{item.resolved.toLocaleString('pt-BR')}</td>
+                            <td className="px-2 py-3 text-right">
                               <span className="text-sm font-bold text-slate-700">{item.open}</span>
+                            </td>
+                            <td className="px-2 py-3 text-center">
+                              <span className="text-sm font-bold">{item.current}%</span>
+                            </td>
+                            <td className="px-2 py-3 text-center">
+                              <span className="text-sm font-bold text-slate-500">{item.previous}%</span>
+                            </td>
+                            <td className="px-2 py-3 text-center">
+                              {(() => {
+                                const diff = item.previous - item.current;
+                                if (diff === 0) {
+                                  return (
+                                    <span className="inline-flex items-center justify-center w-6 h-6 bg-yellow-100 text-yellow-600 rounded-full">
+                                      <Clock size={12} />
+                                    </span>
+                                  );
+                                } else if (diff > 0) {
+                                  return (
+                                    <span className="inline-flex items-center justify-center w-6 h-6 bg-green-100 text-green-600 rounded-full">
+                                      <TrendingUp size={12} />
+                                    </span>
+                                  );
+                                } else {
+                                  return (
+                                    <span className="inline-flex items-center justify-center w-6 h-6 bg-red-100 text-red-600 rounded-full">
+                                      <TrendingDown size={12} />
+                                    </span>
+                                  );
+                                }
+                              })()}
                             </td>
                           </tr>
                         ))}
@@ -405,6 +407,92 @@ export default function App() {
                     </table>
                   </div>
                 </div>
+                <div className="flex gap-6 mt-4 px-2">
+                  <div className="flex items-center gap-2 text-xs text-slate-600">
+                    <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center text-green-600"><TrendingUp size={10} /></div> Verde - Crescimento
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-600">
+                    <div className="w-4 h-4 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600"><Clock size={10} /></div> Amarelo - Estável
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-600">
+                    <div className="w-4 h-4 bg-red-100 rounded-full flex items-center justify-center text-red-600"><TrendingDown size={10} /></div> Vermelho - Piora
+                  </div>
+                </div>
+              </motion.div>
+            ) : activeTab === 'input-neighborhood' ? (
+              <motion.div 
+                key="input-neighborhood"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="space-y-4"
+              >
+                <form onSubmit={(e) => { e.preventDefault(); setActiveTab('weekly'); }} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                  <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+                    <h3 className="text-lg font-bold text-slate-900">Inserir Dados Bairros</h3>
+                    <button 
+                      type="submit"
+                      className="bg-purple-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-purple-700 transition-colors"
+                    >
+                      Salvar Dados
+                    </button>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead>
+                        <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+                          <th className="px-4 py-3 font-semibold whitespace-nowrap">Bairro</th>
+                          <th className="px-4 py-3 font-semibold text-right">Total de Demandas</th>
+                          <th className="px-4 py-3 font-semibold text-right">Demandas Resolvidas</th>
+                          <th className="px-4 py-3 font-semibold text-right">% Semana Anterior</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {neighborhoodData.map((item, idx) => (
+                          <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                            <td className="px-4 py-3 font-medium text-slate-900 whitespace-nowrap">{item.name}</td>
+                            <td className="px-4 py-3 text-right">
+                              <input 
+                                type="number" 
+                                defaultValue={item.total}
+                                className="w-24 px-2 py-1 rounded-lg border border-slate-200 text-sm text-right"
+                                onChange={(e) => {
+                                  const newData = [...neighborhoodData];
+                                  newData[idx].total = Number(e.target.value);
+                                  setNeighborhoodData(newData);
+                                }}
+                              />
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <input 
+                                type="number" 
+                                defaultValue={item.resolved}
+                                className="w-24 px-2 py-1 rounded-lg border border-slate-200 text-sm text-right"
+                                onChange={(e) => {
+                                  const newData = [...neighborhoodData];
+                                  newData[idx].resolved = Number(e.target.value);
+                                  setNeighborhoodData(newData);
+                                }}
+                              />
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <input 
+                                type="number" 
+                                defaultValue={item.previous}
+                                className="w-24 px-2 py-1 rounded-lg border border-slate-200 text-sm text-right"
+                                onChange={(e) => {
+                                  const newData = [...neighborhoodData];
+                                  newData[idx].previous = Number(e.target.value);
+                                  setNeighborhoodData(newData);
+                                }}
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </form>
               </motion.div>
             ) : (
               <motion.div 
