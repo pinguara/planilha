@@ -1,10 +1,22 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const getSupabaseConfig = () => {
+  const envUrl = import.meta.env.VITE_SUPABASE_URL;
+  const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase credentials missing. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your environment.');
-}
+  // Fallback values
+  const defaultUrl = 'https://bidtlnjfnzdgbuhzjobp.supabase.co';
+  const defaultKey = 'sb_publishable_oNtSFQlanO25xuxl3x9sQQ_VgUzGPXZ';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  // Validate envUrl: must be a non-empty string starting with http
+  const isValidUrl = (url: any) => typeof url === 'string' && url.trim().length > 0 && url.startsWith('http');
+
+  const finalUrl = isValidUrl(envUrl) ? envUrl : defaultUrl;
+  const finalKey = (typeof envKey === 'string' && envKey.trim().length > 0) ? envKey : defaultKey;
+
+  return { url: finalUrl, key: finalKey };
+};
+
+const { url, key } = getSupabaseConfig();
+
+export const supabase = createClient(url, key);
