@@ -127,8 +127,43 @@ export default function App() {
     { name: 'Vila Emil', total: 30231, resolved: 29770, current: 98, previous: 99, signal: -1, open: 461 },
     { name: 'Vila Norma', total: 5000, resolved: 4900, current: 98, previous: 98, signal: 0, open: 100 },
   ]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        // Fetch Daily Stats
+        const { data: dailyData, error: dailyError } = await supabase
+          .from('daily_stats')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (dailyData && !dailyError) {
+          setTotalDemands(dailyData.total_demands);
+          setReceivedToday(dailyData.received_today);
+          setReferenceDate(dailyData.reference_date);
+          setSummaryData(dailyData.summary_data);
+        }
+
+        // Fetch Neighborhood Stats
+        const { data: nData, error: nError } = await supabase
+          .from('neighborhood_stats')
+          .select('*')
+          .order('name', { ascending: true });
+
+        if (nData && nData.length > 0 && !nError) {
+          setNeighborhoodData(nData);
+        }
+      } catch (err) {
+        console.error('Error fetching data:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       if (error) {
         console.error('Error getting session:', error);
@@ -144,6 +179,8 @@ export default function App() {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsLoggedIn(!!session);
     });
+
+    fetchData();
 
     return () => subscription.unsubscribe();
   }, []);
@@ -164,29 +201,86 @@ export default function App() {
     await supabase.auth.signOut();
   };
 
-  const handleUpdateData = (e: FormEvent<HTMLFormElement>) => {
+  const handleUpdateData = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
-    const newTotal = Number(formData.get('totalDemands'));
-    const newReceived = Number(formData.get('receivedToday'));
+    const newTotal = Number(formData.get('totalDemands')) || 0;
+    const newReceived = Number(formData.get('receivedToday')) || 0;
     const newDate = formData.get('referenceDate') as string;
     
-    setTotalDemands(newTotal);
-    setReceivedToday(newReceived);
-    setReferenceDate(newDate);
-
     const updatedSummary = summaryData.map(item => {
-      const newValue = Number(formData.get(item.label));
+      const newValue = Number(formData.get(item.label)) || 0;
+      const percentageValue = newTotal > 0 ? ((newValue / newTotal) * 100).toFixed(2) : "0";
       return {
         ...item,
         value: newValue,
-        percentage: ((newValue / newTotal) * 100).toFixed(2).replace('.', ',') + '%'
+        percentage: percentageValue.replace('.', ',') + '%'
       };
     });
 
-    setSummaryData(updatedSummary);
-    setActiveTab('daily');
+    try {
+      // Save to Supabase
+      const { error, data } = await supabase
+        .from('daily_stats')
+        .upsert({
+          id: 1, 
+          total_demands: newTotal,
+          received_today: newReceived,
+          reference_date: newDate,
+          summary_data: updatedSummary,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Erro Supabase (Daily):', error);
+        alert(`Erro ao salvar no banco: ${error.message}`);
+      } else {
+        console.log('Dados diários salvos com sucesso:', data);
+        setTotalDemands(newTotal);
+        setReceivedToday(newReceived);
+        setReferenceDate(newDate);
+        setSummaryData(updatedSummary);
+        alert('Dados diários salvos com sucesso!');
+        setActiveTab('daily');
+      }
+    } catch (err) {
+      console.error('Erro inesperado:', err);
+      alert('Ocorreu um erro inesperado ao tentar salvar.');
+    }
+  };
+
+  const handleSaveNeighborhoodData = async (e: FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      // Prepare data and avoid NaN
+      const dataToSave = neighborhoodData.map(item => {
+        const currentCalc = item.total > 0 ? Math.round((item.resolved / item.total) * 100) : 0;
+        return {
+          ...item,
+          current: currentCalc,
+          open: item.total - item.resolved
+        };
+      });
+
+      const { error, data } = await supabase
+        .from('neighborhood_stats')
+        .upsert(dataToSave);
+
+      if (error) {
+        console.error('Erro Supabase (Bairros):', error);
+        alert(`Erro ao salvar bairros: ${error.message}`);
+      } else {
+        console.log('Dados dos bairros salvos com sucesso:', data);
+        setNeighborhoodData(dataToSave);
+        alert('Dados dos bairros salvos com sucesso!');
+        setActiveTab('weekly');
+      }
+    } catch (err) {
+      console.error('Erro inesperado:', err);
+      alert('Ocorreu um erro inesperado ao salvar os bairros.');
+    }
   };
 
   const groupedMetaLabels = ['Resolvidas', 'Recusadas', 'Indeferidas'];
@@ -325,7 +419,12 @@ export default function App() {
 
         {/* Dashboard Content */}
         <div className="flex-1 overflow-y-auto p-6">
-          <AnimatePresence mode="wait">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+            </div>
+          ) : (
+            <AnimatePresence mode="wait">
             {activeTab === 'daily' ? (
               <motion.div 
                 key="daily"
@@ -511,7 +610,7 @@ export default function App() {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-4"
               >
-                <form onSubmit={(e) => { e.preventDefault(); setActiveTab('weekly'); }} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <form onSubmit={handleSaveNeighborhoodData} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                   <div className="p-6 border-b border-slate-100 flex justify-between items-center">
                     <h3 className="text-lg font-bold text-slate-900">Inserir Dados Bairros</h3>
                     <button 
@@ -653,6 +752,7 @@ export default function App() {
               </motion.div>
             )}
           </AnimatePresence>
+        )}
         </div>
       </main>
     </div>
