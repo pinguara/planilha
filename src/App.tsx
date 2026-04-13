@@ -220,8 +220,9 @@ export default function App() {
     });
 
     try {
+      console.log('Tentando salvar dados diários...', { newTotal, newReceived, newDate, updatedSummary });
       // Save to Supabase
-      const { error, data } = await supabase
+      const { error, data, status, statusText } = await supabase
         .from('daily_stats')
         .upsert({
           id: 1, 
@@ -230,13 +231,14 @@ export default function App() {
           reference_date: newDate,
           summary_data: updatedSummary,
           updated_at: new Date().toISOString()
-        });
+        }, { onConflict: 'id' });
+
+      console.log('Resposta Supabase (Daily):', { error, data, status, statusText });
 
       if (error) {
         console.error('Erro Supabase (Daily):', error);
-        alert(`Erro ao salvar no banco: ${error.message}`);
+        alert(`Erro ao salvar no banco: ${error.message} (Status: ${status})`);
       } else {
-        console.log('Dados diários salvos com sucesso:', data);
         setTotalDemands(newTotal);
         setReceivedToday(newReceived);
         setReferenceDate(newDate);
@@ -258,21 +260,29 @@ export default function App() {
       const dataToSave = neighborhoodData.map(item => {
         const currentCalc = item.total > 0 ? Math.round((item.resolved / item.total) * 100) : 0;
         return {
-          ...item,
+          name: item.name,
+          total: item.total,
+          resolved: item.resolved,
+          previous: item.previous,
           current: currentCalc,
-          open: item.total - item.resolved
+          open: item.total - item.resolved,
+          signal: item.signal,
+          updated_at: new Date().toISOString()
         };
       });
 
-      const { error, data } = await supabase
+      console.log('Tentando salvar dados dos bairros...', dataToSave);
+
+      const { error, data, status, statusText } = await supabase
         .from('neighborhood_stats')
-        .upsert(dataToSave);
+        .upsert(dataToSave, { onConflict: 'name' });
+
+      console.log('Resposta Supabase (Bairros):', { error, data, status, statusText });
 
       if (error) {
         console.error('Erro Supabase (Bairros):', error);
-        alert(`Erro ao salvar bairros: ${error.message}`);
+        alert(`Erro ao salvar bairros: ${error.message} (Status: ${status})`);
       } else {
-        console.log('Dados dos bairros salvos com sucesso:', data);
         setNeighborhoodData(dataToSave);
         alert('Dados dos bairros salvos com sucesso!');
         setActiveTab('weekly');
